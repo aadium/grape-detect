@@ -1,4 +1,4 @@
 # grape-detect
-Link to download the Yolo V3 model weights: https://drive.google.com/drive/folders/1Lq0EtBXCZjRbRhleE0m53IUWdYs-T0MR?usp=sharing
+https://drive.google.com/file/d/1wz0pACVMTV9x1HwatQSxKj8wSWG5yOcQ/view?usp=sharing
 
 To perform object detection, run the yolov3.py file.
