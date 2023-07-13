@@ -1,5 +1,5 @@
 # grape-detect
-https://drive.google.com/file/d/1wz0pACVMTV9x1HwatQSxKj8wSWG5yOcQ/view?usp=sharing
+Model weights can be found here: https://drive.google.com/file/d/1wz0pACVMTV9x1HwatQSxKj8wSWG5yOcQ/view?usp=sharing
 
 To perform object detection, run the grapes_yolov3.py file.
 
