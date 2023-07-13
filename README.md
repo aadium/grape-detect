@@ -1,6 +1,7 @@
 # grape-detect
 https://drive.google.com/file/d/1wz0pACVMTV9x1HwatQSxKj8wSWG5yOcQ/view?usp=sharing
-To perform object detection, run the yolov3.py file.
+
+To perform object detection, run the grapes_yolov3.py file.
 
 <H2>Description</H2>
 This code defines a Python class called StreamCamera that performs real-time object detection on a video stream from a camera. The class uses the YOLOv3 (You Only Look Once) deep learning model to detect grapes in the video frames. It keeps track of the number of grapes detected and calculates a yield estimate based on the count of detected grapes.
