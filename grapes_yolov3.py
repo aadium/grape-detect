@@ -7,9 +7,10 @@ class StreamCamera:
         self.running = False
         self.net = None
         self.classes = []
+        self.detected_grapes = set()
 
     def load_model(self):
-        # Load the Tiny YOLO v3 network
+        # Load the YOLO v3 network
         self.net = cv2.dnn.readNetFromDarknet('yolov3.cfg', 'yv3_grapes.weights')
 
         # Load the classes
@@ -24,33 +25,26 @@ class StreamCamera:
         self.running = True
         while self.running:
             _, frame = self.cap.read()
+            
+            detections = self.detect_objects(frame)
+            frame = self.draw_detections(frame, detections)
 
-            # Resize the frame to a smaller size
-            small_frame = cv2.resize(frame, (500, 300))
-
-            # Convert the resized frame to a blob
-            blob = cv2.dnn.blobFromImage(small_frame, 1/255.0, (416, 416), swapRB=True, crop=False)
-
-            # Set the blob as the input to the network
-            self.net.setInput(blob)
-
-            # Run forward pass to get output layer predictions
-            outs = self.net.forward(self.net.getUnconnectedOutLayersNames())
-
-            # Process the output layer predictions
-            detections = self.process_predictions(outs, frame)
-
-            # Display the frame with detections
             cv2.imshow('Object Detection', frame)
-
-            # Break the loop if 'q' is pressed
             if cv2.waitKey(1) == ord('q'):
                 break
 
         self.cap.release()
         cv2.destroyAllWindows()
 
-    def process_predictions(self, outs, frame):
+        yield_estimate = self.calculate_yield_estimate()
+        print('Grapes Yield Estimate:', yield_estimate)
+
+    def detect_objects(self, frame):
+        
+        blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416), swapRB=True, crop=False)
+        self.net.setInput(blob)
+        outs = self.net.forward(self.net.getUnconnectedOutLayersNames())
+
         height, width = frame.shape[:2]
 
         class_ids = []
@@ -90,11 +84,29 @@ class StreamCamera:
                 'box': (x, y, w, h)
             })
 
-            # Draw the bounding box and label on the frame
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(frame, f'{label}: {confidence:.2f}', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
         return detections
+
+    def draw_detections(self, frame, detections):
+        for detection in detections:
+            label = detection['label']
+            confidence = detection['confidence']
+            box = detection['box']
+
+            x, y, w, h = box
+            grape_id = f'{x}_{y}'
+
+            # Check if grape has already been detected
+            if grape_id not in self.detected_grapes:
+                self.detected_grapes.add(grape_id)  # Add grape to set of detected grapes
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.circle(frame, ((x + int(w / 2)), (y + int(h / 2))), 5, (0, 0, 255), -1)
+                cv2.putText(frame, f'{label}: {confidence:.2f}', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        return frame
+
+    def calculate_yield_estimate(self):
+        yield_estimate = len(self.detected_grapes)
+        return yield_estimate
 
     def stop_stream(self):
         self.running = False
