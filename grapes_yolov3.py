@@ -36,9 +36,6 @@ class StreamCamera:
         self.cap.release()
         cv2.destroyAllWindows()
 
-        yield_estimate = self.calculate_yield_estimate()
-        print('Grapes Yield Estimate:', yield_estimate)
-
     def detect_objects(self, frame):
         
         blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416), swapRB=True, crop=False)
@@ -104,15 +101,11 @@ class StreamCamera:
 
         return frame
 
-    def calculate_yield_estimate(self):
-        yield_estimate = len(self.detected_grapes)
-        return yield_estimate
-
     def stop_stream(self):
         self.running = False
 
 def main():
-    stream_camera = StreamCamera(0)
+    stream_camera = StreamCamera("testingVideos/grapev2.mp4")
     stream_camera.start_stream()
 
 if __name__ == "__main__":
